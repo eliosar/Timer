@@ -47,6 +47,7 @@ class MainActivity : AppCompatActivity() {
             intent.putExtra(this.logTag, LOG_TAG)
             Log.d(LOG_TAG, "new Activity")
             startActivity(intent)
+            finish()
         }
         Log.d(LOG_TAG, "------------------")
     }

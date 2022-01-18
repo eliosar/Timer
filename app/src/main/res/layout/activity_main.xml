@@ -12,7 +12,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:onClick="setTimerAction"
-        android:text="set Timer"
+        android:text="@string/set_timer"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -24,7 +24,7 @@
         android:layout_marginTop="45dp"
         android:clickable="false"
         android:contextClickable="false"
-        android:text="repeat"
+        android:text="@string/repeat"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -35,7 +35,7 @@
         android:layout_marginTop="85dp"
         android:clickable="false"
         android:contextClickable="false"
-        android:text="maxTime"
+        android:text="@string/maxtime"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/repeatText" />
 
@@ -45,12 +45,14 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:ems="10"
-        android:hint="repeat Minutes"
+        android:hint="@string/repeat_minutes"
         android:inputType="time"
         android:minHeight="48dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="TextContrastCheck"
+        android:autofillHints="" />
 
     <EditText
         android:id="@+id/maxMinutes"
@@ -58,12 +60,13 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="54dp"
         android:ems="10"
-        android:hint="max Minutes"
+        android:hint="@string/max_minutes"
         android:inputType="time"
         android:minHeight="48dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/repeatMinutes"
-        tools:ignore="SpeakableTextPresentCheck" />
+        tools:ignore="SpeakableTextPresentCheck,TextContrastCheck"
+        android:autofillHints="" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

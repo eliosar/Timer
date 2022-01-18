@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Timer</string>
+    <string name="stop_timer">stop Timer</string>
+    <string name="set_timer">set Timer</string>
+    <string name="repeat">repeat</string>
+    <string name="maxtime">maxTime</string>
+    <string name="repeat_minutes">repeat Minutes</string>
+    <string name="max_minutes">max Minutes</string>
+    <string name="_00_00_00">00:00:00</string>
+    <string name="repeats">repeats:</string>
 </resources>
