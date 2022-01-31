@@ -3,8 +3,10 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/eborh/OneDrive/Dokumente/Git hub/AndroidStudio/Timer/app/src/main/res/layout/activity_confirmtimer.xml" value="0.15760869565217392" />
         <entry key="..\:/Users/eborh/OneDrive/Dokumente/Git hub/AndroidStudio/Timer/app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="..\:/Users/eborh/OneDrive/Dokumente/Git hub/AndroidStudio/Timer/app/src/main/res/layout/activity_started_timer.xml" value="0.1" />
+        <entry key="..\:/Users/eborh/OneDrive/Dokumente/Git hub/AndroidStudio/Timer/app/src/main/res/layout/set_timer.xml" value="0.15760869565217392" />
         <entry key="..\:/Users/eborh/OneDrive/Dokumente/Git hub/Timer/app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="..\:/Users/eborh/OneDrive/Dokumente/Git hub/Timer/app/src/main/res/layout/timer_countdown.xml" value="0.17552083333333332" />
       </map>

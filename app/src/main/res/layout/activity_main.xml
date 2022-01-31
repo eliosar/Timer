@@ -1,21 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/parent_linear_Layout"
     tools:context=".MainActivity">
-
-    <Button
-        android:id="@+id/timerbutton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:onClick="setTimerAction"
-        android:text="@string/set_timer"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/repeatText"
@@ -27,6 +19,22 @@
         android:text="@string/repeat"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/repeatMinutes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-40dp"
+        android:layout_marginStart="64dp"
+        android:autofillHints=""
+        android:ems="10"
+        android:hint="@string/repeat_minutes"
+        android:inputType="time"
+        android:minHeight="48dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="TextContrastCheck" />
 
     <TextView
         android:id="@+id/maxText"
@@ -40,25 +48,11 @@
         app:layout_constraintTop_toBottomOf="@+id/repeatText" />
 
     <EditText
-        android:id="@+id/repeatMinutes"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:ems="10"
-        android:hint="@string/repeat_minutes"
-        android:inputType="time"
-        android:minHeight="48dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="TextContrastCheck"
-        android:autofillHints="" />
-
-    <EditText
         android:id="@+id/maxMinutes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="54dp"
+        android:layout_marginTop="-40dp"
+        android:layout_marginStart="64dp"
         android:ems="10"
         android:hint="@string/max_minutes"
         android:inputType="time"
@@ -69,4 +63,15 @@
         tools:ignore="SpeakableTextPresentCheck,TextContrastCheck"
         android:autofillHints="" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <Button
+        android:id="@+id/timerbutton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="setTimerAction"
+        android:text="@string/set_timer"
+        android:layout_marginTop="400dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</LinearLayout>

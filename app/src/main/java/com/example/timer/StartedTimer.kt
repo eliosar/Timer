@@ -1,6 +1,13 @@
 package com.example.timer
 
 import android.annotation.SuppressLint
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.TaskStackBuilder
+import android.content.Context
+import android.content.Intent
+import android.media.RingtoneManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -9,32 +16,51 @@ import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.core.app.NotificationCompat
 import java.util.*
-import java.util.concurrent.Delayed
 
-class StartedTimer : AppCompatActivity() {
+open class StartedTimer : AppCompatActivity() {
 
+    val CHANNEl_ID = "lol"
+    val currentrepeatsleftlocation = "com.example.timer.currentrepeats"
+    var logTag = "com.example.logTag"
     private var repeatSeconds: Int = 0
-    private var repeats: Int = 0
-    private var LOG_TAG: String? = ""
-    private var newtimer = true
     private var togo_in_percent: Float = 100f
-    private var currentrepeats = 1
-    private var timer: Timer? = Timer()
-    private lateinit var pb: ProgressBar
     private lateinit var timerText: TextView
     private lateinit var repeatsText: TextView
+    companion object : StartedTimer() {
+        var newtimer = true
+        private var LOG_TAG = ""
+        private var timer: Timer? = Timer()
+        private lateinit var pb: ProgressBar
+        private var currentrepeats = 1
+        private var repeats: Int = 0
+
+        fun stopTimer(view: View){
+            Log.d(LOG_TAG, "timer manual finished")
+            newtimer = false
+            timer?.cancel()
+            timer?.purge()
+            timer = null
+            timer = Timer()
+            pb.progress = 0
+            currentrepeats = repeats + 1
+        }
+    }
+    @SuppressLint("SetTextI18n")
     private val timerthread = Thread {
         while (currentrepeats <= repeats){
             if(newtimer) {
-                Log.d(LOG_TAG, "$currentrepeats < $repeats")
                 newtimer = false
+                Log.d(LOG_TAG, "$currentrepeats < $repeats")
                 Handler(Looper.getMainLooper()).postDelayed({
                     progress()
                     repeatsText.text = "repeats: ${repeats - currentrepeats}"
                 }, 0)
             }
         }
+        startActivity(Intent(this, MainActivity::class.java))
+        finish()
     }
 
     @SuppressLint("SetTextI18n")
@@ -45,7 +71,7 @@ class StartedTimer : AppCompatActivity() {
         repeatSeconds = intent.getIntExtra(MainActivity::repeatMinutes.get(MainActivity()), repeatSeconds)
         repeatSeconds *= 60
         repeats = intent.getIntExtra(MainActivity::repeats.get(MainActivity()), repeats)
-        LOG_TAG = intent.getStringExtra(MainActivity::logTag.get(MainActivity()))
+        LOG_TAG = intent.getStringExtra(MainActivity::logTag.get(MainActivity())).toString()
         pb = findViewById(R.id.timeprogressline)
         timerText = findViewById(R.id.timerText)
         repeatsText = findViewById(R.id.repeatsText)
@@ -72,21 +98,46 @@ class StartedTimer : AppCompatActivity() {
                     timer = null
                     timer = Timer()
 
+                    startconfirmActivity()
+
                     currentrepeats++
-                    newtimer = true
                 }
                 currentSeconds--
             }
-        }, 0, 1000) // if program finished period = 1000
+        }, 0, 100) // if program finished period = 1000
     }
 
-    fun stopTimer(view: View){
-        timer?.cancel()
-        timer?.purge()
-        timer = null
-        timer = Timer()
-        pb.progress = 0
-        Log.d(LOG_TAG, "timer manual finished")
+    fun stop_Timer(view: View){
+        stopTimer(view)
+    }
+
+    fun startconfirmActivity(){
+        val intent = Intent(this, ConfirmTimer::class.java)
+        intent.putExtra(currentrepeatsleftlocation, repeats - currentrepeats)
+        intent.putExtra(logTag, LOG_TAG)
+
+        /*val notibuilder = NotificationCompat.Builder(this, "Notifications")
+        val alarmsound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+        val pattern = longArrayOf(100, 200, 300, 400, 500)
+
+        notibuilder.setSound(alarmsound)
+        notibuilder.setVibrate(pattern)
+
+        val newintent = Intent(this, ConfirmTimer::class.java)
+        val stackBuilder = TaskStackBuilder.create(this)
+
+        stackBuilder.addParentStack(ConfirmTimer::class.java)
+        stackBuilder.addNextIntent(newintent)
+
+        val pendingintent = PendingIntent.getActivity(this, 0, newintent, PendingIntent.FLAG_UPDATE_CURRENT)
+        notibuilder.setContentIntent(pendingintent)
+
+        val channel = NotificationChannel(CHANNEl_ID, "Timer finished", NotificationManager.IMPORTANCE_DEFAULT)
+
+        val notifiManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notifiManager.createNotificationChannel(channel)*/
+
+        startActivity(intent)
     }
 
     @SuppressLint("SetTextI18n")

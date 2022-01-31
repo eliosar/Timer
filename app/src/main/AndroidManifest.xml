@@ -10,10 +10,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Timer">
         <activity
+            android:name=".ConfirmTimer"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+        <activity
             android:name=".StartedTimer"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
+            android:screenOrientation="portrait"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
