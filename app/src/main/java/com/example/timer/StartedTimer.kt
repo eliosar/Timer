@@ -35,7 +35,7 @@ open class StartedTimer : AppCompatActivity() {
         private var currentrepeats = 1
         private var repeats: Int = 0
 
-        fun stopTimer(view: View){
+        fun stopTimer(){
             Log.d(LOG_TAG, "timer manual finished")
             newtimer = false
             timer?.cancel()
@@ -58,8 +58,10 @@ open class StartedTimer : AppCompatActivity() {
                 }, 0)
             }
         }
-        startActivity(Intent(this, MainActivity::class.java))
         finish()
+        startActivity(Intent(this, MainActivity::class.java))
+        currentrepeats = 1
+        newtimer = true
     }
 
     @SuppressLint("SetTextI18n")
@@ -103,11 +105,11 @@ open class StartedTimer : AppCompatActivity() {
                 }
                 currentSeconds--
             }
-        }, 0, 1000) // if program finished period = 1000
+        }, 0, 100) // if program finished period = 1000
     }
 
     fun stop_Timer(view: View){
-        stopTimer(view)
+        stopTimer()
     }
 
     fun startconfirmActivity(){

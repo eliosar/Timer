@@ -52,7 +52,7 @@ class ConfirmTimer : AppCompatActivity() {
     }
 
     fun stopTimer(view: View){
-        StartedTimer.stopTimer(view)
+        StartedTimer.stopTimer()
         stopNotification()
         finish()
     }
