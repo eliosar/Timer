@@ -37,7 +37,7 @@
         android:id="@+id/stopTimer"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_marginTop="500dp"
+        android:layout_marginTop="400dp"
         android:minHeight="32dp"
         android:onClick="stop_Timer"
         android:text="@string/stop_timer"

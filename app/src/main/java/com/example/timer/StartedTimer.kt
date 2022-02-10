@@ -21,7 +21,6 @@ import java.util.*
 
 open class StartedTimer : AppCompatActivity() {
 
-    val CHANNEl_ID = "lol"
     val currentrepeatsleftlocation = "com.example.timer.currentrepeats"
     var logTag = "com.example.logTag"
     private var repeatSeconds: Int = 0
@@ -68,7 +67,7 @@ open class StartedTimer : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_started_timer)
 
-        repeatSeconds = intent.getIntExtra(MainActivity::repeatMinutes.get(MainActivity()), repeatSeconds)
+        repeatSeconds = intent.getIntExtra(MainActivity::repeatMinutesLoc.get(MainActivity()), repeatSeconds)
         repeatSeconds *= 60
         repeats = intent.getIntExtra(MainActivity::repeats.get(MainActivity()), repeats)
         LOG_TAG = intent.getStringExtra(MainActivity::logTag.get(MainActivity())).toString()
@@ -104,7 +103,7 @@ open class StartedTimer : AppCompatActivity() {
                 }
                 currentSeconds--
             }
-        }, 0, 100) // if program finished period = 1000
+        }, 0, 1000) // if program finished period = 1000
     }
 
     fun stop_Timer(view: View){
@@ -115,27 +114,6 @@ open class StartedTimer : AppCompatActivity() {
         val intent = Intent(this, ConfirmTimer::class.java)
         intent.putExtra(currentrepeatsleftlocation, repeats - currentrepeats)
         intent.putExtra(logTag, LOG_TAG)
-
-        /*val notibuilder = NotificationCompat.Builder(this, "Notifications")
-        val alarmsound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-        val pattern = longArrayOf(100, 200, 300, 400, 500)
-
-        notibuilder.setSound(alarmsound)
-        notibuilder.setVibrate(pattern)
-
-        val newintent = Intent(this, ConfirmTimer::class.java)
-        val stackBuilder = TaskStackBuilder.create(this)
-
-        stackBuilder.addParentStack(ConfirmTimer::class.java)
-        stackBuilder.addNextIntent(newintent)
-
-        val pendingintent = PendingIntent.getActivity(this, 0, newintent, PendingIntent.FLAG_UPDATE_CURRENT)
-        notibuilder.setContentIntent(pendingintent)
-
-        val channel = NotificationChannel(CHANNEl_ID, "Timer finished", NotificationManager.IMPORTANCE_DEFAULT)
-
-        val notifiManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notifiManager.createNotificationChannel(channel)*/
 
         startActivity(intent)
     }
