@@ -1,73 +1,48 @@
 package com.example.timer
 
 import android.annotation.SuppressLint
-import android.app.AlarmManager
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.content.Intent
-import android.media.RingtoneManager
-import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Context
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.TextView
-import androidx.core.app.NotificationCompat
+import androidx.appcompat.app.AppCompatActivity
 
 class ConfirmTimer : AppCompatActivity() {
-    private var LOG_TAG = ""
-    private lateinit var alarmManager: AlarmManager
-    private lateinit var pendingIntent: PendingIntent
+    private lateinit var LOG_TAG: String
+    private lateinit var currentSound: MediaPlayer
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "InvalidWakeLockTag")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_confirmtimer)
 
-        var currentrepeatsleft = 0
+        LOG_TAG = MainActivity::LOG_TAG.get(MainActivity())
 
-        LOG_TAG = intent.getStringExtra(StartedTimer::logTag.get(StartedTimer())).toString()
-        currentrepeatsleft = intent.getIntExtra(StartedTimer::currentrepeatsleftlocation.get(StartedTimer()), currentrepeatsleft)
-
-        findViewById<TextView>(R.id.repeats).text = "repeats: $currentrepeatsleft"
+        findViewById<TextView>(R.id.repeats).text = "repeats: ${intent.getIntExtra(StartedTimer::currentRepeatsLeftLocation.get(StartedTimer()), 0)}"
         Log.d(LOG_TAG, "confirm timer")
 
-        createNotificationChannel()
-    }
+        currentSound = MediaPlayer()
+        currentSound.setDataSource(getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE).getString("currentSoundPath", null))
+        currentSound.prepare()
 
-    private fun createNotificationChannel() {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            val name = "TimerReminderChannel"
-            val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel("lol", name, importance)
-            val notifymanager = getSystemService(NotificationManager::class.java)
-            notifymanager.createNotificationChannel(channel)
-        }
-
-        alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
-        val intent = Intent(this, NotificationReceiver::class.java)
-        pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0)
-        alarmManager.set(AlarmManager.RTC_WAKEUP, 0, pendingIntent)
+        currentSound.start()
     }
 
     fun stopTimer(view: View){
-        StartedTimer.stopTimer()
-        stopNotification()
+        currentSound.stop()
+        StartedTimer.cancelTimer()
+
         finish()
     }
 
     fun confirmTimer(view: View){
-        Log.d(LOG_TAG, "timer confirmed")
+        currentSound.stop()
         StartedTimer.newtimer = true
-        stopNotification()
-        finish()
-    }
+        StartedTimer.nextWindow = false
+        Log.d(LOG_TAG, "timer confirmed")
 
-    private fun stopNotification(){
-        alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
-        val intent = Intent(this, NotificationReceiver::class.java)
-        pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0)
-        alarmManager.cancel(pendingIntent)
+        finish()
     }
 }

@@ -34,15 +34,25 @@
         android:text="@string/repeats" />
 
     <Button
-        android:id="@+id/stopTimer"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginTop="400dp"
         android:minHeight="32dp"
-        android:onClick="stop_Timer"
-        android:text="@string/stop_timer"
+        android:onClick="cancelTimer"
+        android:text="@string/cancel_timer"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="30dp"
+        android:minHeight="32dp"
+        android:onClick="stopResumeTimer"
+        android:text="@string/stop_timer"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"  />
 
 </LinearLayout>

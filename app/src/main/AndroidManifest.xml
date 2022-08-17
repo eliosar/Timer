@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.timer">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -12,7 +14,8 @@
         <activity
             android:name=".ConfirmTimer"
             android:screenOrientation="portrait"
-            android:exported="false" />
+            android:exported="false"
+            android:showOnLockScreen="true"/>
         <activity
             android:name=".StartedTimer"
             android:screenOrientation="portrait"
@@ -28,7 +31,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".NotificationReceiver"/>
+
     </application>
 
 </manifest>

@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Timer</string>
     <string name="stop_timer">stop Timer</string>
+    <string name="resume_timer">resume Timer</string>
     <string name="set_timer">set Timer</string>
     <string name="repeat">repeat</string>
     <string name="maxtime">maxTime</string>
@@ -14,4 +15,7 @@
     <string name="secondrepeat" />
     <string name="firstmax" />
     <string name="secondmax" />
+    <string name="music_menu">Music Menu</string>
+    <string name="cancel_timer">cancel Timer</string>
+    <string name="Music" />
 </resources>

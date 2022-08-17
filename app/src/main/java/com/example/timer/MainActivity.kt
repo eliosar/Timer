@@ -1,30 +1,30 @@
 package com.example.timer
 
+import android.annotation.SuppressLint
+import android.app.usage.ExternalStorageStats
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.text.Editable
-import android.text.SpannableString
-import android.text.SpannableStringBuilder
 import android.util.Log
 import android.view.View
-import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.TextView
-import androidx.annotation.ContentView
-import androidx.constraintlayout.widget.ConstraintLayout
+import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import androidx.core.graphics.drawable.toDrawable
-import org.w3c.dom.Text
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
-    private val LOG_TAG = "MY_ACTIVITY"
+    val LOG_TAG = "MY_ACTIVITY"
 
     val repeatMinutesLoc = "com.example.timer.repeatMinutes"
     val repeats = "com.example.timer.repeats"
-    val logTag = "com.example.timer.Log_Tag"
 
     private lateinit var firstrepeatView: TextView
     private lateinit var secondrepeatView: TextView
@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity() {
 
     private var repeatMinutes: Int = 0
     private var maxMinutes: Int = 0
+    private var currentSoundPath = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,10 +48,51 @@ class MainActivity : AppCompatActivity() {
         secondmaxView = findViewById(R.id.secondmax)
 
         loadData()
+        loadMusic()
+
+        Log.d(LOG_TAG, "Data loaded")
 
         findViewById<EditText>(R.id.repeatMinutes).onFocusChangeListener = onFocusChangeListenerrepeat()
 
         findViewById<EditText>(R.id.maxMinutes).onFocusChangeListener = onFocusChangeListenermax()
+    }
+
+    fun setMusicView(view: View){
+        findViewById<ScrollView>(R.id.scrollView).visibility = TextView.VISIBLE
+        changeButtonsVisibility(TextView.GONE)
+    }
+
+    fun choseMusic(view: View){
+        view as TextView
+        findViewById<CardView>(R.id.scrollView).visibility = TextView.GONE
+        changeButtonsVisibility(TextView.VISIBLE)
+        currentSoundPath = view.hint.toString()
+    }
+
+    private fun changeButtonsVisibility(state: Int){
+        findViewById<Button>(R.id.musicButton).visibility = state
+        findViewById<Button>(R.id.timerbutton).visibility = state
+    }
+
+    @SuppressLint("Range", "InflateParams")
+    private fun loadMusic(){
+        val files = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).listFiles()
+
+        val musicContainer = layoutInflater.inflate(R.layout.container, null).findViewById<TextView>(R.id.MusicView)
+
+        /*val recyclerListView = findViewById<RecyclerView>(R.id.recyclerView)
+        recyclerListView.layoutManager = LinearLayoutManager(this)*/
+        files.forEach { song ->
+            if(song.length() > 4 && song.name.endsWith(".mp3")) {
+                Log.d(LOG_TAG, "song detected: ${song.name}")
+
+                musicContainer.text = "${song.nameWithoutExtension}"
+                musicContainer.hint = "${song.path}"
+
+                //recyclerListView.addView(musicContainer)
+                musicContainer.hint.toString().also { currentSoundPath = it }
+            }
+        }
     }
 
     fun setTimerAction(view: View) {
@@ -74,7 +116,7 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, StartedTimer::class.java)
             intent.putExtra(repeatMinutesLoc, repeatMinutes)
             intent.putExtra(this.repeats, repeats)
-            intent.putExtra(this.logTag, LOG_TAG)
+
             Log.d(LOG_TAG, "new Activity")
 
             saveData()
@@ -99,6 +141,8 @@ class MainActivity : AppCompatActivity() {
                 putInt("firstmax", maxMinutes)
                 putInt("secondmax", sp.getInt("firstmax", 0))
             }
+
+            putString("currentSoundPath", currentSoundPath)
         }.apply()
     }
 
@@ -108,8 +152,7 @@ class MainActivity : AppCompatActivity() {
         secondrepeatView.text = "${sp.getInt("secondrepeat", 0)}"
         firstmaxView.text = "${sp.getInt("firstmax", 0)}"
         secondmaxView.text = "${sp.getInt("secondmax", 0)}"
-
-        Log.d(LOG_TAG, "Data loaded")
+        currentSoundPath = "${sp.getString("currentSoundPath", null)}"
     }
 
     private fun onFocusChangeListenerrepeat(): View.OnFocusChangeListener{
