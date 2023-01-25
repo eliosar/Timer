@@ -1,27 +1,23 @@
 package com.example.timer
 
 import android.annotation.SuppressLint
-import android.app.usage.ExternalStorageStats
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Environment
-import android.provider.MediaStore
 import android.text.Editable
 import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.cardview.widget.CardView
 import androidx.core.graphics.drawable.toDrawable
+import androidx.core.view.size
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
-
-    val LOG_TAG = "MY_ACTIVITY"
 
     val repeatMinutesLoc = "com.example.timer.repeatMinutes"
     val repeats = "com.example.timer.repeats"
@@ -32,9 +28,41 @@ class MainActivity : AppCompatActivity() {
     private lateinit var firstmaxView: TextView
     private lateinit var secondmaxView: TextView
 
-    private var repeatMinutes: Int = 0
-    private var maxMinutes: Int = 0
-    private var currentSoundPath = ""
+    private lateinit var repeatText: TextView
+    private lateinit var maxText: TextView
+
+    private var repeatMinutes = 0
+    private var maxMinutes = 0
+
+    companion object{
+        val LOG_TAG = "MY_ACTIVITY"
+        var currentSoundPath = ""
+        private var songsFound = 0
+        lateinit var recyclerView: RecyclerView
+        @SuppressLint("StaticFieldLeak")
+        lateinit var musicButton: Button
+        @SuppressLint("StaticFieldLeak")
+        lateinit var timerButton: Button
+
+        fun setMusicView(){
+            if(songsFound > 0) {
+                recyclerView.visibility = TextView.VISIBLE
+                changeButtonsVisibility(TextView.GONE)
+            }
+        }
+
+        fun choseMusic(path: String) {
+            Log.d("MY_AC", "music $path chosen")
+            recyclerView.visibility = TextView.GONE
+            changeButtonsVisibility(TextView.VISIBLE)
+            currentSoundPath = path
+        }
+
+        private fun changeButtonsVisibility(state: Int){
+            musicButton.visibility = state
+            timerButton.visibility = state
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,66 +74,64 @@ class MainActivity : AppCompatActivity() {
         secondrepeatView = findViewById(R.id.secondrepeat)
         firstmaxView = findViewById(R.id.firstmax)
         secondmaxView = findViewById(R.id.secondmax)
+        recyclerView = findViewById(R.id.recyclerView)
+        musicButton = findViewById(R.id.musicButton)
+        timerButton = findViewById(R.id.timerbutton)
+        repeatText = findViewById<EditText>(R.id.repeatMinutes)
+        maxText = findViewById<EditText>(R.id.maxMinutes)
 
         loadData()
         loadMusic()
 
         Log.d(LOG_TAG, "Data loaded")
 
-        findViewById<EditText>(R.id.repeatMinutes).onFocusChangeListener = onFocusChangeListenerrepeat()
-
-        findViewById<EditText>(R.id.maxMinutes).onFocusChangeListener = onFocusChangeListenermax()
+        repeatText.onFocusChangeListener = onFocusChangeListenerRepeat()
+        maxText.onFocusChangeListener = onFocusChangeListenerMax()
     }
 
     fun setMusicView(view: View){
-        findViewById<ScrollView>(R.id.scrollView).visibility = TextView.VISIBLE
-        changeButtonsVisibility(TextView.GONE)
+        setMusicView()
     }
 
-    fun choseMusic(view: View){
-        view as TextView
-        findViewById<CardView>(R.id.scrollView).visibility = TextView.GONE
-        changeButtonsVisibility(TextView.VISIBLE)
-        currentSoundPath = view.hint.toString()
-    }
-
-    private fun changeButtonsVisibility(state: Int){
-        findViewById<Button>(R.id.musicButton).visibility = state
-        findViewById<Button>(R.id.timerbutton).visibility = state
-    }
-
-    @SuppressLint("Range", "InflateParams")
+    @SuppressLint("InflateParams")
     private fun loadMusic(){
         val files = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).listFiles()
 
-        val musicContainer = layoutInflater.inflate(R.layout.container, null).findViewById<TextView>(R.id.MusicView)
+        val songs : ArrayList<File> = ArrayList()
 
-        /*val recyclerListView = findViewById<RecyclerView>(R.id.recyclerView)
-        recyclerListView.layoutManager = LinearLayoutManager(this)*/
-        files.forEach { song ->
-            if(song.length() > 4 && song.name.endsWith(".mp3")) {
-                Log.d(LOG_TAG, "song detected: ${song.name}")
-
-                musicContainer.text = "${song.nameWithoutExtension}"
-                musicContainer.hint = "${song.path}"
-
-                //recyclerListView.addView(musicContainer)
-                musicContainer.hint.toString().also { currentSoundPath = it }
+        if(files.isNotEmpty()){
+            files?.forEach { song ->
+                if(song.length() > 4 && song.name.endsWith(".mp3")) {
+                    Log.d(LOG_TAG, "song detected: ${song.nameWithoutExtension}")
+                    songs.add(song)
+                }
             }
         }
+
+        songsFound = songs.size
+
+        val recyclerListView = findViewById<RecyclerView>(R.id.recyclerView)
+        recyclerListView.layoutManager = LinearLayoutManager(this)
+        recyclerListView.adapter = MyAdapter(applicationContext, songs)
     }
 
     fun setTimerAction(view: View) {
-        val repeatMinutesView = findViewById<EditText>(R.id.repeatMinutes)
-        val maxMinutesView = findViewById<EditText>(R.id.maxMinutes)
+        val repeatMinutesView = repeatText
+        val maxMinutesView = maxText
+        var checkRight = true
+        var repeats = 0
 
-        repeatMinutes = Integer.parseInt(repeatMinutesView.text.toString())
-        maxMinutes = Integer.parseInt(maxMinutesView.text.toString())
+        try {
+            repeatMinutes = Integer.parseInt(repeatMinutesView.text.toString())
+            maxMinutes = Integer.parseInt(maxMinutesView.text.toString())
 
-        val repeats: Int = maxMinutes / repeatMinutes
-        Log.d(LOG_TAG, "$repeats = $maxMinutes / $repeatMinutes")
+            repeats = maxMinutes / repeatMinutes
+            Log.d(LOG_TAG, "$repeats = $maxMinutes / $repeatMinutes")
 
-        val checkRight: Boolean = (repeatMinutes * repeats == maxMinutes) && repeatMinutes != 0 && repeats != 0
+            checkRight = ((repeatMinutes * repeats == maxMinutes) && repeatMinutes != 0 && repeats != 0) && currentSoundPath.isNotEmpty()
+        }catch (e: java.lang.Exception){
+            checkRight = false
+        }
 
         if (!checkRight) {
             Log.d(LOG_TAG, "false Input")
@@ -113,6 +139,7 @@ class MainActivity : AppCompatActivity() {
             maxMinutesView.background = Color.RED.toDrawable()
         }else run {
             Log.d(LOG_TAG, "right Input")
+
             val intent = Intent(this, StartedTimer::class.java)
             intent.putExtra(repeatMinutesLoc, repeatMinutes)
             intent.putExtra(this.repeats, repeats)
@@ -131,7 +158,7 @@ class MainActivity : AppCompatActivity() {
         val sp = getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE)
         val editor = sp.edit()
 
-        editor.apply(){
+        editor.apply{
             if(repeatMinutes != sp.getInt("firstrepeat", 0) && repeatMinutes != sp.getInt("secondrepeat", 0)) {
                 putInt("firstrepeat", repeatMinutes)
                 putInt("secondrepeat", sp.getInt("firstrepeat", 0))
@@ -155,7 +182,7 @@ class MainActivity : AppCompatActivity() {
         currentSoundPath = "${sp.getString("currentSoundPath", null)}"
     }
 
-    private fun onFocusChangeListenerrepeat(): View.OnFocusChangeListener{
+    private fun onFocusChangeListenerRepeat(): View.OnFocusChangeListener{
         return View.OnFocusChangeListener(
             fun(view: View, hasFocus: Boolean) {
                 if (hasFocus) {
@@ -169,7 +196,7 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    private fun onFocusChangeListenermax(): View.OnFocusChangeListener{
+    private fun onFocusChangeListenerMax(): View.OnFocusChangeListener{
         return View.OnFocusChangeListener(
             fun(view: View, hasFocus: Boolean) {
                 if (hasFocus) {
@@ -183,15 +210,13 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    fun repeatselected(viewnormal: View){
-        val view = viewnormal as TextView
-        val text = Editable.Factory.getInstance().newEditable(view.text)
-        findViewById<EditText>(R.id.repeatMinutes).text = text
+    fun repeatSelected(view: View){
+        view as TextView
+        repeatText.text = Editable.Factory.getInstance().newEditable(view.text)
     }
 
-    fun maxselected(viewnormal: View){
-        val view = viewnormal as TextView
-        val text = Editable.Factory.getInstance().newEditable(view.text)
-        findViewById<EditText>(R.id.maxMinutes).text = text
+    fun maxSelected(view: View){
+        view as TextView
+        maxText.text = Editable.Factory.getInstance().newEditable(view.text)
     }
 }

@@ -1,73 +1,65 @@
 package com.example.timer
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import java.util.*
-import android.os.PowerManager
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.Context
-import android.widget.Button
-import java.util.concurrent.TimeUnit
 
 
 open class StartedTimer : AppCompatActivity() {
-
-    val currentRepeatsLeftLocation = "com.example.timer.currentRepeatsLeft"
-    private var minusSeconds = 1
-    private var currentSeconds = 0
+    val repeatsLeftLocation = "com.example.timer.repeatsLeft"
     private var repeatSeconds = 0
-    private var alarmManager: AlarmManager? = null
-    private var togo_in_percent: Float = 100f
-    private lateinit var timerText: TextView
     private lateinit var repeatsText: TextView
     companion object {
-        var nextWindow = false
-        var newtimer = true
-        private var LOG_TAG = ""
-        private var timer: Timer? = Timer()
-        @SuppressLint("StaticFieldLeak")
-        private lateinit var pb: ProgressBar
-        private var currentrepeats = 1
+        private lateinit var startedTimer: StartedTimer
+        private var minusSeconds = 1
+        private lateinit var currentSound: MediaPlayer
+        private val LOG_TAG = MainActivity.LOG_TAG
+        private var timer = Timer()
+        private var repeatsLeft = 1
         private var repeats: Int = 0
+        var newTimer = true
 
         fun cancelTimer(){
             Log.d(LOG_TAG, "timer manual finished")
-            newtimer = false
-            timer?.cancel()
-            timer?.purge()
-            timer = null
+
+            resetTimer()
+
+            startedTimer.startActivity(Intent(startedTimer, MainActivity::class.java))
+            startedTimer.finish()
+        }
+
+        private fun resetTimer(){
+            timer.cancel()
+            timer.purge()
             timer = Timer()
-            pb.progress = 0
-            currentrepeats = repeats + 1
         }
     }
 
     @SuppressLint("SetTextI18n")
     private val timerthread = Thread {
-        while (currentrepeats <= repeats){
-            if(newtimer) {
-                newtimer = false
-                Log.d(LOG_TAG, "$currentrepeats. Timer")
+        repeatsLeft = repeats - 1
+        newTimer = true
+        do{
+            if(newTimer) {
+                newTimer = false
+                Log.d(LOG_TAG, "${repeats - repeatsLeft}. Timer")
                 Handler(Looper.getMainLooper()).postDelayed({
                     progress()
-                    repeatsText.text = "repeats: ${repeats - currentrepeats}"
+                    repeatsText.text = "repeats: $repeatsLeft"
                 }, 0)
             }
-        }
-
-        finish()
-        startActivity(Intent(this, MainActivity::class.java))
-        currentrepeats = 1
-        newtimer = true
+        }while (repeatsLeft >= 0)
     }
 
     @SuppressLint("SetTextI18n")
@@ -77,58 +69,41 @@ open class StartedTimer : AppCompatActivity() {
 
         repeatSeconds = intent.getIntExtra(MainActivity::repeatMinutesLoc.get(MainActivity()), 0) * 60
         repeats = intent.getIntExtra(MainActivity::repeats.get(MainActivity()), 0)
-        LOG_TAG = MainActivity::LOG_TAG.get(MainActivity())
 
-        pb = findViewById(R.id.timeprogressline)
-        timerText = findViewById(R.id.timerText)
         repeatsText = findViewById(R.id.repeatsText)
-
         repeatsText.text = "repeats: $repeats"
+
+        startedTimer = this
+
+        currentSound = MediaPlayer().also {
+            it.setDataSource(getSharedPreferences("sharedPrefs",Context.MODE_PRIVATE).getString("currentSoundPath", null))
+        }
+
         timerthread.start()
     }
 
-    private fun isScreenAwake(): Boolean{
-        return (getSystemService(POWER_SERVICE) as PowerManager).isInteractive
-    }
-
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
-        super.onWindowFocusChanged(hasFocus)
-        Log.d(LOG_TAG, "${alarmManager == null}")
-        Log.d(LOG_TAG, "${!hasFocus}")
-
-        if(alarmManager == null && !hasFocus && isScreenAwake()){
-            if(!nextWindow) {
-                Log.d(LOG_TAG, "new scheduled alarm")
-                scheduleNotification()
-            }
-        }
-
-        if(alarmManager != null && hasFocus){
-            Log.d(LOG_TAG, "delete of scheduled alarm")
-            alarmManager = null
+    override fun onWindowFocusChanged(hasFocus: Boolean){
+        if(currentSound.isPlaying && hasFocus){
+            startConfirmTimerActivity()
         }
     }
 
     private fun progress() {
-        currentSeconds = repeatSeconds
-        timer?.scheduleAtFixedRate(object : TimerTask() {
+        var currentSeconds = repeatSeconds
+        timer.scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
-                togo_in_percent = (currentSeconds.toFloat() / repeatSeconds.toFloat()) * 100
-
-                pb.progress = togo_in_percent.toInt()
+                val togoInPercent = ((currentSeconds.toFloat() / repeatSeconds.toFloat()) * 100).toInt()
+                findViewById<ProgressBar>(R.id.timeprogressline).progress = togoInPercent
 
                 setTimerText(currentSeconds)
 
                 if (currentSeconds == 0) {
                     Log.d(LOG_TAG, "timer finished")
-                    timer?.cancel()
-                    timer?.purge()
-                    timer = null
-                    timer = Timer()
 
+                    resetTimer()
                     startConfirmActivity()
 
-                    currentrepeats++
+                    repeatsLeft--
                 }
                 currentSeconds -= minusSeconds
             }
@@ -154,31 +129,27 @@ open class StartedTimer : AppCompatActivity() {
         }
     }
 
-    fun startConfirmActivity() {
-        if(alarmManager == null) {
-            nextWindow = true
-            startActivity(Intent(this, ConfirmTimer::class.java).also{
-                it.putExtra(currentRepeatsLeftLocation, repeats - currentrepeats)
-            })
+    fun startConfirmActivity(){
+        currentSound.prepare()
+
+        currentSound.start()
+
+        Log.d(LOG_TAG, "has focus: ${hasWindowFocus()}")
+        if(hasWindowFocus()){
+            startConfirmTimerActivity()
         }
     }
 
-    fun Context.scheduleNotification() {
-        alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val timeInMillis = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(/*currentSeconds.toLong()*/2L)
+    private fun startConfirmTimerActivity(){
+        currentSound.stop()
 
-        with(alarmManager) {
-            this?.setExact(AlarmManager.RTC_WAKEUP, timeInMillis, getReceiver())
+        startActivity(Intent(this, ConfirmTimer::class.java).also {
+            it.putExtra(repeatsLeftLocation, repeatsLeft)
+        })
+
+        if(repeatsLeft <= 0){
+            finish()
         }
-    }
-
-    private fun Context.getReceiver(): PendingIntent {
-        return PendingIntent.getBroadcast(
-            this,
-            0,
-            NotificationReceiver.build(this, this as StartedTimer),
-            0
-        )
     }
 
     @SuppressLint("SetTextI18n")
@@ -187,10 +158,6 @@ open class StartedTimer : AppCompatActivity() {
         val minutes = ((currentSeconds % 86400) % 3600) / 60
         val hours = ((currentSeconds % 86400) / 3600)
 
-        timerText.text =  "${String.format("%02d", hours)} : ${String.format("%02d", minutes)} : ${String.format("%02d", seconds)}"
-    }
-
-    fun getCurrentRepeatsLeft(): Int{
-        return repeats - currentrepeats
+        findViewById<TextView>(R.id.timerText).text =  "${String.format("%02d", hours)} : ${String.format("%02d", minutes)} : ${String.format("%02d", seconds)}"
     }
 }

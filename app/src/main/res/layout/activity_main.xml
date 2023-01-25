@@ -6,71 +6,35 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/parent_linear_Layout"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:orientation="horizontal">
 
     <TextView
         android:id="@+id/repeatText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="45dp"
         android:clickable="false"
         android:contextClickable="false"
         android:text="@string/repeat"
+        app:layout_constraintBottom_toBottomOf="@+id/repeatMinutes"
+        app:layout_constraintEnd_toStartOf="@+id/repeatMinutes"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/repeatMinutes" />
 
     <EditText
         android:id="@+id/repeatMinutes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="45dp"
         android:autofillHints=""
         android:ems="10"
         android:hint="@string/repeat_minutes"
         android:inputType="time"
         android:minHeight="48dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="TextContrastCheck" />
-
-    <TextView
-        android:id="@+id/maxText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="150dp"
-        android:clickable="false"
-        android:contextClickable="false"
-        android:text="@string/maxtime"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/repeatText" />
-
-    <EditText
-        android:id="@+id/maxMinutes"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="120dp"
-        android:autofillHints=""
-        android:ems="10"
-        android:hint="@string/max_minutes"
-        android:inputType="time"
-        android:minHeight="48dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/repeatMinutes"
-        tools:ignore="SpeakableTextPresentCheck,TextContrastCheck" />
-
-    <Button
-        android:id="@+id/timerbutton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="setTimerAction"
-        android:text="@string/set_timer"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/firstrepeat"
@@ -81,12 +45,11 @@
         android:ems="10"
         android:focusable="true"
         android:minHeight="48dp"
-        android:onClick="repeatselected"
+        android:onClick="repeatSelected"
         android:textSize="18sp"
         android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.49"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/repeatMinutes"
+        app:layout_constraintStart_toStartOf="@+id/repeatMinutes"
         app:layout_constraintTop_toBottomOf="@+id/repeatMinutes"
         tools:ignore="TextContrastCheck" />
 
@@ -99,13 +62,39 @@
         android:ems="10"
         android:focusable="true"
         android:minHeight="48dp"
-        android:onClick="repeatselected"
+        android:onClick="repeatSelected"
         android:textSize="18sp"
         android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.49"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/repeatMinutes"
+        app:layout_constraintStart_toStartOf="@+id/repeatMinutes"
         app:layout_constraintTop_toBottomOf="@+id/firstrepeat" />
+
+    <TextView
+        android:id="@+id/maxText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="false"
+        android:contextClickable="false"
+        android:text="@string/maxtime"
+        app:layout_constraintBottom_toBottomOf="@+id/maxMinutes"
+        app:layout_constraintEnd_toStartOf="@+id/maxMinutes"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/maxMinutes" />
+
+    <EditText
+        android:id="@+id/maxMinutes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="120dp"
+        android:autofillHints=""
+        android:ems="10"
+        android:hint="@string/max_minutes"
+        android:inputType="time"
+        android:minHeight="48dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/repeatMinutes"
+        tools:ignore="SpeakableTextPresentCheck,TextContrastCheck" />
 
     <TextView
         android:id="@+id/firstmax"
@@ -116,16 +105,14 @@
         android:ems="10"
         android:focusable="true"
         android:minHeight="48dp"
-        android:onClick="maxselected"
+        android:onClick="maxSelected"
         android:textSize="18sp"
         android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.49"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/maxMinutes"
+        app:layout_constraintStart_toStartOf="@+id/maxMinutes"
         app:layout_constraintTop_toBottomOf="@+id/maxMinutes" />
 
     <TextView
-        android:visibility="gone"
         android:id="@+id/secondmax"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -133,30 +120,43 @@
         android:ems="10"
         android:focusable="true"
         android:minHeight="48dp"
-        android:onClick="maxselected"
+        android:onClick="maxSelected"
         android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.49"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/firstmax"
-        tools:ignore="OnClick" />
-
-    <Button
-        android:id="@+id/musicButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="120dp"
-        android:onClick="setMusicView"
-        android:text="@string/music_menu"
-        app:layout_constraintBottom_toTopOf="@+id/timerbutton"
-        tools:ignore="DuplicateSpeakableTextCheck" />
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/maxMinutes"
+        app:layout_constraintStart_toStartOf="@+id/maxMinutes"
+        app:layout_constraintTop_toBottomOf="@+id/firstmax" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="0dp"
-        android:visibility="gone"/>
+        android:layout_gravity="center"
+        android:background="#904FBC"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/timerbutton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
+    <Button
+        android:id="@+id/musicButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="100dp"
+        android:onClick="setMusicView"
+        android:text="@string/music_menu"
+        app:layout_constraintBottom_toTopOf="@+id/timerbutton"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="DuplicateSpeakableTextCheck" />
+
+    <Button
+        android:id="@+id/timerbutton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:onClick="setTimerAction"
+        android:text="@string/set_timer"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
